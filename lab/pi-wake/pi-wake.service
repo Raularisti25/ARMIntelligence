@@ -8,6 +8,7 @@ Type=simple
 ExecStart=%h/ARMIntelligence/lab/pi-wake/pi-wake.sh
 Restart=always
 RestartSec=15
+RestartPreventExitStatus=75 78
 Nice=10
 
 # Mirror the proven ARM Pi lifecycle: stop the daemon first, let its active
@@ -20,12 +21,12 @@ Environment=ARM_LAB_WAKE_SECONDS=900
 Environment=ARM_LAB_SETTLE_SECONDS=120
 Environment=ARM_LAB_STOP_GRACE_SECONDS=1200
 Environment=ARM_LAB_IDLE_EXIT_CODE=75
+EnvironmentFile=-%h/.config/arm-intelligence/pi-wake.env
 
-# Configure these in an EnvironmentFile or systemd override, not by committing
-# machine-specific values here:
-# Environment=ARM_LAB_WAKE_PROGRAM=/usr/bin/node
-# Environment=ARM_LAB_WAKE_ARGS_JSON=["/home/user/ARMIntelligence/lab/my-agent/wake.mjs"]
-# EnvironmentFile=-%h/.config/arm-intelligence/pi-wake.env
+# The EnvironmentFile should define the wake target without committing
+# machine-specific paths or credentials into this public repository:
+# ARM_LAB_WAKE_PROGRAM=/usr/bin/node
+# ARM_LAB_WAKE_ARGS_JSON=["/home/user/ARMIntelligence/lab/my-agent/wake.mjs"]
 
 [Install]
 WantedBy=default.target
