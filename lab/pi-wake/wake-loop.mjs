@@ -10,7 +10,7 @@ const WATCH_SECONDS = numberEnv('ARM_LAB_WAKE_SECONDS', 900, 1);
 const SETTLE_SECONDS = numberEnv('ARM_LAB_SETTLE_SECONDS', 120, 0);
 const STOP_GRACE_SECONDS = numberEnv('ARM_LAB_STOP_GRACE_SECONDS', 1200, 0);
 const IDLE_EXIT_CODE = numberEnv('ARM_LAB_IDLE_EXIT_CODE', 75, 0);
-const PROGRAM = env.ARM_LAB_WAKE_PROGRAM || 'node';
+const PROGRAM = env.ARM_LAB_WAKE_PROGRAM || '';
 const ARGS = jsonArgs(env.ARM_LAB_WAKE_ARGS_JSON || '[]');
 const STATE_DIR = expandHome(env.ARM_LAB_STATE_DIR || '~/.arm-intelligence/pi-wake');
 const HEALTH_FILE = path.join(STATE_DIR, 'health.json');
@@ -29,7 +29,17 @@ for (const signal of ['SIGTERM', 'SIGINT']) {
 
 process.on('exit', releaseLock);
 
-await main();
+if (!PROGRAM) {
+  writeHealth({
+    status: 'unconfigured',
+    pid: process.pid,
+    host: os.hostname(),
+    error: 'ARM_LAB_WAKE_PROGRAM is required',
+  });
+  process.exitCode = 78;
+} else {
+  await main();
+}
 
 async function main() {
   writeHealth({ status: 'starting', pid: process.pid, host: os.hostname() });
@@ -109,15 +119,22 @@ function requestStop(signal) {
 function sleepInterruptibly(ms) {
   if (ms <= 0 || stopping) return Promise.resolve();
   return new Promise((resolve) => {
-    const timer = setTimeout(resolve, ms);
-    const poll = setInterval(() => {
-      if (!stopping) return;
+    let finished = false;
+    let timer;
+    let poll;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
       clearTimeout(timer);
       clearInterval(poll);
       resolve();
+    };
+
+    timer = setTimeout(finish, ms);
+    poll = setInterval(() => {
+      if (stopping) finish();
     }, Math.min(250, ms));
-    timer.unref?.();
-    poll.unref?.();
   });
 }
 
