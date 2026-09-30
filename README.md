@@ -9,6 +9,10 @@ Portable, public versions of homemade AI skills originally developed inside a la
 - [`/arms`](skills/arms/SKILL.md) - multi-agent orchestration doctrine: keep judgment/integration in the strongest session and delegate separable execution to lower-cost workers when worthwhile.
 - [`/armpartner`](skills/armpartner/SKILL.md) - partner-agent runtime for bounded collaboration on an owner-led project. The AI does most research, implementation, testing, debugging, and documentation while the human collaborator provides judgment, engineering direction, and quality review within the assigned scope.
 
+## LAB
+
+- [`lab/pi-wake`](lab/pi-wake/README.md) - experimental portable extraction of the Raspberry Pi wake lifecycle: systemd persistence, one-at-a-time wake execution, productive-work settle, idle/deferred backoff, locking, health state, and graceful shutdown.
+
 ## Portability
 
 These public copies intentionally omit private infrastructure, machine paths, credentials, queues, internal hosts, owner-only orchestration, and confidential project context. They preserve the underlying behavior and should be adapted to the target LLM/runtime's own homemade-skill mechanism.
