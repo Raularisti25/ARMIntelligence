@@ -27,7 +27,7 @@ ARM_LAB_WAKE_PROGRAM=/usr/bin/node
 ARM_LAB_WAKE_ARGS_JSON=["/home/me/ARMIntelligence/lab/my-agent/wake.mjs"]
 ```
 
-Then enable the `EnvironmentFile` line in the installed service, or add it with a systemd override.
+The supplied service reads that optional environment file automatically.
 
 The wake target owns selection, model choice, auth, task execution, and its own proof of success. This LAB wrapper only owns lifecycle and retry cadence.
 
