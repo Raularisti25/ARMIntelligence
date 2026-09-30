@@ -1,0 +1,31 @@
+[Unit]
+Description=ARMIntelligence LAB Pi wake loop
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/ARMIntelligence/lab/pi-wake/pi-wake.sh
+Restart=always
+RestartSec=15
+Nice=10
+
+# Mirror the proven ARM Pi lifecycle: stop the daemon first, let its active
+# child finish during the grace window, and keep a hard final ceiling.
+KillMode=mixed
+TimeoutStopSec=1800
+
+Environment=ARM_INTELLIGENCE_ROOT=%h/ARMIntelligence
+Environment=ARM_LAB_WAKE_SECONDS=900
+Environment=ARM_LAB_SETTLE_SECONDS=120
+Environment=ARM_LAB_STOP_GRACE_SECONDS=1200
+Environment=ARM_LAB_IDLE_EXIT_CODE=75
+
+# Configure these in an EnvironmentFile or systemd override, not by committing
+# machine-specific values here:
+# Environment=ARM_LAB_WAKE_PROGRAM=/usr/bin/node
+# Environment=ARM_LAB_WAKE_ARGS_JSON=["/home/user/ARMIntelligence/lab/my-agent/wake.mjs"]
+# EnvironmentFile=-%h/.config/arm-intelligence/pi-wake.env
+
+[Install]
+WantedBy=default.target
