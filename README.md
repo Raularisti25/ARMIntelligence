@@ -12,6 +12,7 @@ Portable, public versions of homemade AI skills originally developed inside a la
 ## LAB
 
 - [`lab/pi-wake`](lab/pi-wake/README.md) - experimental portable extraction of the Raspberry Pi wake lifecycle: systemd persistence, one-at-a-time wake execution, productive-work settle, idle/deferred backoff, locking, health state, and graceful shutdown.
+- [`lab/prediction-market`](lab/prediction-market/README.md) - read-only, paper-only prediction-market research package with a public Polymarket scanner and two scoped collaborator tasks: probability calibration/replay and uncertainty-aware Kelly sizing with correlated-event controls.
 
 ## Portability
 
@@ -30,6 +31,6 @@ Give the repository URL to the target LLM and instruct it to:
 5. Preserve behavior and routing boundaries, not foreign infrastructure.
 6. Test at least one positive trigger and one neighboring negative trigger for installed skills.
 
-For a LAB/ARM collaboration package, the collaborator's agent should install/read [`/armpartner`](skills/armpartner/SKILL.md) first, then consume the private Partner Package supplied by the project owner.
+For a LAB/ARM collaboration package, the collaborator's agent should install/read [`/armpartner`](skills/armpartner/SKILL.md) first, then consume the Partner Package supplied by the project owner.
 
 Repository: `https://github.com/Raularisti25/ARMIntelligence`
