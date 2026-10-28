@@ -5,10 +5,11 @@ import Phaser from 'phaser';
 import { INTENSITY } from '../config';
 import type { GameCtx, IIntensity, RoomId } from '../types';
 
-const SCARE_MULT = [1, 1.05, 1.12, 1.25];
+const SCARE_MULT = [1, 1.1, 1.22, 1.36];
+const COOLDOWN_MULT = [1, 0.88, 0.76, 0.64];
 const HYSTERESIS = 0.12;
-const FEAR_GAIN = 0.12 / 100; // per impact point; 0.06 never reached level 1 in play-test
-const FLED_GAIN = 0.05;
+const FEAR_GAIN = 0.006 / 100; // per impact point. Tier 3 is open from the start (5-10x a tier-1 impact, felt by a whole room): 0.3 maxed the meter in <1 s of bot play
+const FLED_GAIN = 0.055; // the arc tracks progress: ~4 fled = Stirring, ~8 = Haunted, ~13 = Awakened
 const DECAY = 0.006; // per second, toward 0.6 × peak
 
 export class HauntingIntensitySystem implements IIntensity {
@@ -47,6 +48,9 @@ export class HauntingIntensitySystem implements IIntensity {
   }
   get scareMult(): number {
     return SCARE_MULT[this.level];
+  }
+  get cooldownMult(): number {
+    return COOLDOWN_MULT[this.level];
   }
 
   addFear(impact: number): void {

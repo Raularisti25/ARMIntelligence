@@ -12,9 +12,9 @@ const rep = (n: number, from: number, step: number, f: (at: number, i: number) =
 const flash = (part: string, at: number, alpha: number, dur: number, hold: number): Fx => ({ k: 'show', at, part, alpha, dur, hold });
 
 const act = (a: ActionDef): ActionDef => a;
-const T1 = { tier: 1 as const, cooldown: 3 };
-const T2 = { tier: 2 as const, cooldown: 6 };
-const T3 = { tier: 3 as const, cooldown: 10 };
+const T1 = { tier: 1 as const, cooldown: 2 };
+const T2 = { tier: 2 as const, cooldown: 4 };
+const T3 = { tier: 3 as const, cooldown: 6.5 };
 
 // ================================================================ ATTIC ====
 

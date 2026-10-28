@@ -107,6 +107,8 @@ export class GameScene extends Phaser.Scene {
       this.hud.dismissIntro();
     });
 
+    if (!this.hud.awaitingStart) input.markTouched();
+
     this.installDebug();
     document.getElementById('boot')?.classList.add('gone');
     window.setTimeout(() => document.getElementById('boot')?.remove(), 1000);
@@ -160,7 +162,7 @@ export class GameScene extends Phaser.Scene {
   // --------------------------------------------------------------- update ----
 
   update(_time: number, delta: number): void {
-    if (this.paused) return;
+    if (this.paused || !this.started || this.won) return;
     const dt = Math.min(delta / 1000, 0.05) * this.speed;
     this.clockMs += dt * 1000;
     const c = this.ctx;
@@ -179,6 +181,7 @@ export class GameScene extends Phaser.Scene {
     c.fx.update(dt);
     this.hud.near = this.possession.near;
     this.hud.update(dt);
+    this.hud.setClock(this.started ? this.clockMs - c.stats.startMs : null);
   }
 
   /** Party guests knock, walk in through the front door, and join the house. */

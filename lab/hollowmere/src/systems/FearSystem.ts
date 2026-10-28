@@ -141,7 +141,7 @@ export class FearSystem implements IFear {
     let skeptic = 1;
     if (ev.kind === 'haunt' && (ev.tier ?? 1) <= 2) {
       const calm = Math.max(0, 1 - n.fear / 40);
-      skeptic = 1 - t.skepticism * (ev.tier === 2 ? 0.3 : 0.65) * calm;
+      skeptic = 1 - t.skepticism * (ev.tier === 2 ? 0.25 : 0.5) * calm;
     }
     const own = n.hidingIn !== null && n.hidingIn === ev.sourceId ? 2 : 1;
 

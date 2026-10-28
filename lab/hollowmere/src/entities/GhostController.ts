@@ -1,4 +1,4 @@
-// The player: a small sheet ghost. Free 2D float with exponential steering,
+// The player: a small spectral ghost. Free 2D float with exponential steering,
 // spring squash/stretch + lean, idle bob, eye tracking, trail and halo.
 // Positions are integrated with dt; camera follow happens AFTER this in GameScene.
 
@@ -58,8 +58,6 @@ export class GhostController implements IGhost {
   private body: Phaser.GameObjects.Image;
   private eyeL: Phaser.GameObjects.Image;
   private eyeR: Phaser.GameObjects.Image;
-  private blushL: Phaser.GameObjects.Image;
-  private blushR: Phaser.GameObjects.Image;
   private mouth: Phaser.GameObjects.Image;
   private rig: Phaser.GameObjects.Container; // everything that squashes / leans
   private trail: { img: Phaser.GameObjects.Image; life: number; max: number; active: boolean }[] = [];
@@ -94,12 +92,10 @@ export class GhostController implements IGhost {
 
     this.halo = s.add.image(0, 2, 'fx:glow').setBlendMode(Phaser.BlendModes.ADD).setTint(0x9fe8ff).setAlpha(0.35);
     this.body = s.add.image(0, 0, 'ghost:body0').setScale(BASE);
-    this.blushL = s.add.image(-15, -6, 'ghost:blush').setScale(BASE).setAlpha(0.8);
-    this.blushR = s.add.image(15, -6, 'ghost:blush').setScale(BASE).setAlpha(0.8);
     this.eyeL = s.add.image(-8, -15, 'ghost:eye').setScale(BASE);
     this.eyeR = s.add.image(8, -15, 'ghost:eye').setScale(BASE);
     this.mouth = s.add.image(0, -4, 'ghost:mouth').setScale(BASE);
-    this.rig = s.add.container(0, 0, [this.halo, this.body, this.blushL, this.blushR, this.eyeL, this.eyeR, this.mouth]);
+    this.rig = s.add.container(0, 0, [this.halo, this.body, this.eyeL, this.eyeR, this.mouth]);
     this.container = s.add.container(this.x, this.y, [this.rig]).setDepth(DEPTH.ghost);
 
     for (let i = 0; i < TRAIL_N; i++) {
@@ -289,13 +285,11 @@ export class GhostController implements IGhost {
     this.eyeL.setPosition(-8 + this.lookX, -15 + this.lookY).setScale(BASE, eyeScaleY);
     this.eyeR.setPosition(8 + this.lookX, -15 + this.lookY).setScale(BASE, eyeScaleY);
     this.mouth.setPosition(this.lookX * 0.6, -4 + this.lookY * 0.5);
-    this.blushL.setPosition(-15 + this.lookX * 0.4, -6 + this.lookY * 0.4);
-    this.blushR.setPosition(15 + this.lookX * 0.4, -6 + this.lookY * 0.4);
 
     // halo pulse
-    const pulse = 1 + Math.sin(this.t * 2.0) * 0.06;
+    const pulse = 1 + Math.sin(this.t * 2.0) * 0.06 + Math.sin(this.t * 11.7) * 0.015;
     this.halo.setScale((2.0 + this.strength * 0.7) * pulse);
-    this.halo.setAlpha(0.35 + this.strength * 0.4 + norm * 0.1);
+    this.halo.setAlpha((0.28 + this.strength * 0.32 + norm * 0.1) * pulse);
     this.applyStrength(this.strength);
 
     // ---- trail + wisps when fast ----

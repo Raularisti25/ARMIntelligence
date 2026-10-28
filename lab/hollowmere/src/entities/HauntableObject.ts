@@ -217,10 +217,14 @@ export class HauntableObject implements IHauntable {
     this.addMisc([{ k: 'squash', at: 0, amt: 0.1, dur: 300 }], this.outerRig, 320);
   }
 
+  /**
+   * Every action is open from the first possession (Raul 2026-10-27: tier-1 alone
+   * could not scare anyone, so locking tiers 2-3 behind intensity made the game
+   * unplayable). Escalation now comes from cooldowns, novelty and the intensity
+   * level's power/cooldown bonuses instead of locks.
+   */
   unlocked(index: number): boolean {
-    const a = this.def.actions[index];
-    if (!a) return false;
-    return this.ctx.intensity.level >= a.tier - 1;
+    return !!this.def.actions[index];
   }
 
   cooldownLeft(index: number): number {
@@ -251,7 +255,7 @@ export class HauntableObject implements IHauntable {
     for (const em of a.emits ?? []) tl.emits.push({ ...em, fired: false });
     this.action = tl;
 
-    this.cdTotal[index] = a.cooldown + a.duration / 1000;
+    this.cdTotal[index] = a.cooldown * c.intensity.cooldownMult + a.duration / 1000;
     this.cd[index] = this.cdTotal[index];
 
     c.stats.haunts++;

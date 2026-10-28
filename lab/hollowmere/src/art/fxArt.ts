@@ -61,7 +61,7 @@ function ghostPath(g: Ctx2D, cx: number, w: number, h: number, phase: number): v
   const top = 8;
   const hemY = h - 10;
   const half = 29; // body half-width at the hem
-  const steps = 14;
+  const steps = 24;
   g.beginPath();
   g.moveTo(cx - 17, 34);
   // head dome
@@ -73,8 +73,8 @@ function ghostPath(g: Ctx2D, cx: number, w: number, h: number, phase: number): v
   for (let i = 0; i <= steps; i++) {
     const u = i / steps;
     const x = cx + half - u * half * 2;
-    const amp = 5.2 * (0.55 + 0.45 * Math.sin(u * Math.PI));
-    const y = hemY + Math.sin(u * Math.PI * 3.2 + phase) * amp + Math.sin(u * 9 + phase * 2) * 1.2;
+    const amp = 8 * (0.55 + 0.45 * Math.sin(u * Math.PI));
+    const y = hemY + Math.sin(u * Math.PI * 6 + phase) * amp + Math.sin(u * 19 + phase * 2) * 2;
     g.lineTo(x, y);
   }
   // left flank
@@ -111,7 +111,7 @@ function paintGhostBody(g: Ctx2D, w: number, h: number, frame: number): void {
 
   clipped(g, () => ghostPath(g, cx, w, h, phase), () => {
     // cool belly shade on the right, warm rim on the left (candlelight)
-    g.fillStyle = lin(g, cx - 34, 0, cx + 34, 0, [[0, 0xffe9c8, 0.22], [0.3, 0xffffff, 0], [0.65, 0x8fc7e6, 0], [1, 0x7fb4dc, 0.32]]);
+    g.fillStyle = lin(g, cx - 34, 0, cx + 34, 0, [[0, 0xadd7ff, 0.18], [0.3, 0xffffff, 0], [0.65, 0x8fc7e6, 0], [1, 0x52749c, 0.4]]);
     g.fillRect(0, 0, w, h);
     // head highlight
     g.fillStyle = rad(g, cx - 6, 20, 0, 24, [[0, 0xffffff, 0.85], [1, 0xffffff, 0]]);
@@ -135,36 +135,22 @@ function paintGhostParts(scene: Phaser.Scene): void {
   for (let i = 0; i < GHOST_FRAMES; i++) {
     canvasTex(scene, `ghost:body${i}`, GHOST_W, GHOST_H, (g, w, h) => paintGhostBody(g, w, h, i));
   }
-  // one big dark oval eye with two highlights
+  // Hollow sockets: dark centres and a dim cold rim, without glossy pupils.
   canvasTex(scene, 'ghost:eye', 14, 20, (g) => {
-    ellipse(g, 7, 10, 5.4, 8.2);
-    fill(g, lin(g, 0, 2, 0, 18, [[0, 0x2a2142], [1, PAL.ink]]));
-    g.fillStyle = rgba(0xffffff, 0.96);
-    ellipse(g, 5.2, 6.4, 1.9, 2.3);
+    g.fillStyle = rad(g, 7, 10, 2, 10, [[0, 0x050711, 1], [0.62, 0x0a1020, 1], [1, 0x83b7dd, 0]]);
+    ellipse(g, 7, 10, 6.6, 9.5);
     g.fill();
-    g.fillStyle = rgba(0xffffff, 0.7);
-    ellipse(g, 8.6, 12.4, 0.9, 1);
-    g.fill();
+    ellipse(g, 7, 10, 4.9, 7.6);
+    fill(g, lin(g, 0, 2, 0, 18, [[0, 0x02040a], [1, 0x111c30]]));
   });
   canvasTex(scene, 'ghost:blush', 16, 10, (g) => {
     g.fillStyle = rad(g, 8, 5, 0, 8, [[0, PAL.rose, 0.55], [1, PAL.rose, 0]]);
     g.fillRect(0, 0, 16, 10);
   });
-  // tiny mischievous smile
-  canvasTex(scene, 'ghost:mouth', 16, 10, (g) => {
-    g.strokeStyle = hex(PAL.ink);
-    g.lineWidth = 1.7;
-    g.lineCap = 'round';
-    g.beginPath();
-    g.moveTo(3, 3);
-    g.quadraticCurveTo(8, 9, 13, 3);
-    g.stroke();
-    g.fillStyle = rgba(PAL.rose, 0.7);
-    g.beginPath();
-    g.moveTo(5.2, 4.8);
-    g.quadraticCurveTo(8, 8.4, 10.8, 4.8);
-    g.quadraticCurveTo(8, 6.2, 5.2, 4.8);
-    g.fill();
+  // A small open, silent mouth instead of a cheerful smile.
+  canvasTex(scene, 'ghost:mouth', 16, 14, (g) => {
+    ellipse(g, 8, 7, 2.8, 5.2);
+    fill(g, lin(g, 0, 2, 0, 12, [[0, 0x070b17], [1, 0x203148]]), rgba(0x91b7da, 0.28), 0.8);
   });
 }
 
@@ -572,5 +558,5 @@ export function paintFxTextures(scene: Phaser.Scene): void {
 
 /** Tint helpers for the ghost trail (cyan → violet with intensity). */
 export function ghostTrailTint(strength: number): number {
-  return mix(PAL.ghostCyan, PAL.violet, Math.max(0, Math.min(1, strength)));
+  return mix(0x91c5f4, PAL.violet, Math.max(0, Math.min(1, strength)));
 }

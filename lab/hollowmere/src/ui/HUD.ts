@@ -18,6 +18,9 @@ export interface HudView { cx: number; cy: number; zoom: number; w: number; h: n
 const RING_C = 2 * Math.PI * 20;
 const LEVEL_CAPTIONS = ['', 'The house stirs…', 'Something answers.', 'Hollowmere awakens.'];
 const SKIP_INTRO_KEY = 'hollowmere-skip-intro';
+const BEST_KEY = 'hollowmere-best-ms';
+function readBest(): number { try { return Number(localStorage.getItem(BEST_KEY)) || 0; } catch { return 0; } }
+function bestHtml(): string { const b = readBest(); return b ? `<p class="hm-sub">Record: <b>${mmss(b)}</b> to clear the house</p>` : ''; }
 
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
@@ -38,6 +41,8 @@ function fearColor(f: number): string {
   const c = (j: number) => Math.round(a[j] + (b[j] - a[j]) * k);
   return `rgb(${c(0)},${c(1)},${c(2)})`;
 }
+
+export const PANEL_W = 184; // possession card width (px)
 
 const CSS = `
 #hm-hud, #hm-hud * { box-sizing: border-box; }
@@ -66,20 +71,26 @@ const CSS = `
 .hm-cam.fled::before { background: none; border: 1px dashed rgba(241,227,198,.5); padding: 0; -webkit-mask: none; mask: none; }
 
 /* captions */
-.hm-caps { position: absolute; left: 0; right: 0; top: 26px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.hm-caps { position: absolute; left: 0; right: 0; top: 66px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .hm-cap { font: italic 400 22px/1.2 ${FONT_TITLE}; letter-spacing: .02em; color: #f6ecd2; text-shadow: 0 2px 14px rgba(0,0,0,.75), 0 0 24px rgba(159,232,255,.25); will-change: transform, opacity; }
 .hm-cap.small { font-size: 16px; color: rgba(246,236,210,.92); }
 .hm-cap.quiet { font-size: 15px; color: rgba(246,236,210,.7); }
 
 /* possession panel */
-.hm-panel { position: absolute; left: 0; top: 0; width: 240px; will-change: transform; opacity: 0; transition: opacity .16s; }
+.hm-panel { position: absolute; left: 0; top: 0; width: ${PANEL_W}px; will-change: transform; opacity: 0; transition: opacity .22s; --dx: -10px; --dy: 0px; }
 .hm-panel.on { opacity: 1; }
-.hm-panel .card { pointer-events: auto; padding: 12px 14px 10px; border-radius: 14px; background: rgba(20,14,30,.74); -webkit-backdrop-filter: blur(10px) saturate(1.15); backdrop-filter: blur(10px) saturate(1.15); border: 1px solid rgba(241,227,198,.15); box-shadow: 0 10px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05); transform-origin: 0 50%; }
-.hm-panel.on .card { animation: hm-panel-in .42s cubic-bezier(.2,1.5,.35,1) both; }
-.hm-panel.flip .card { transform-origin: 100% 50%; }
-@keyframes hm-panel-in { from { opacity: 0; transform: translateX(-10px) scale(.84); } to { opacity: 1; transform: none; } }
-.hm-panel .name { font: italic 500 12px/1 ${FONT_TITLE}; font-variant: small-caps; letter-spacing: .14em; color: #e8c372; margin: 0 0 9px 1px; }
-.hm-row { position: relative; display: flex; align-items: center; gap: 9px; padding: 7px 4px 8px; font-size: 13.5px; color: #f6ecd2; cursor: pointer; border-radius: 8px; transition: opacity .25s, background .15s; }
+.hm-panel.on.dim { opacity: .3; }
+.hm-panel.on.dim:hover { opacity: 1; }
+.hm-panel .card { pointer-events: auto; padding: 8px 8px 6px; border-radius: 12px; background: rgba(18,13,28,.62); -webkit-backdrop-filter: blur(8px) saturate(1.2); backdrop-filter: blur(8px) saturate(1.2); border: 1px solid rgba(241,227,198,.12); box-shadow: 0 8px 26px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05); transform-origin: 0 50%; }
+.hm-panel.on .card { animation: hm-panel-in .36s cubic-bezier(.2,1.45,.35,1) both; }
+.hm-panel[data-side=left] { --dx: 10px; } .hm-panel[data-side=left] .card { transform-origin: 100% 50%; }
+.hm-panel[data-side=above] { --dx: 0px; --dy: 8px; } .hm-panel[data-side=above] .card { transform-origin: 50% 100%; }
+.hm-panel[data-side=below] { --dx: 0px; --dy: -8px; } .hm-panel[data-side=below] .card { transform-origin: 50% 0; }
+@keyframes hm-panel-in { from { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.86); } to { opacity: 1; transform: none; } }
+.hm-panel .name { font: italic 500 11px/1 ${FONT_TITLE}; font-variant: small-caps; letter-spacing: .14em; color: #e8c372; margin: 1px 0 5px 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hm-row { position: relative; display: flex; align-items: center; gap: 7px; padding: 5px 4px 6px; font-size: 12.5px; color: #f6ecd2; cursor: pointer; border-radius: 7px; transition: opacity .25s, background .15s; }
+.hm-row .tier { display: flex; gap: 2px; opacity: .75; }
+.hm-row .tier i { width: 4px; height: 4px; border-radius: 50%; background: #e8c372; }
 .hm-row:hover { background: rgba(241,227,198,.07); }
 .hm-row .nm { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hm-row .lock { display: none; font: italic 400 11px/1 ${FONT_TITLE}; color: rgba(241,227,198,.5); }
@@ -93,7 +104,7 @@ const CSS = `
 .hm-row.deny { animation: hm-deny .3s; }
 @keyframes hm-press { 0% { background: rgba(232,195,114,.32); transform: scale(.98); } 100% { background: transparent; transform: none; } }
 @keyframes hm-deny { 0%,100% { transform: none; } 25% { transform: translateX(-3px); } 55% { transform: translateX(3px); } }
-.hm-panel .foot { display: flex; align-items: center; gap: 8px; margin: 6px 2px 0; padding-top: 8px; border-top: 1px solid rgba(241,227,198,.1); font-size: 11.5px; color: rgba(241,227,198,.62); cursor: pointer; }
+.hm-panel .foot { display: flex; align-items: center; gap: 7px; margin: 3px 2px 0; padding: 5px 2px 1px; border-top: 1px solid rgba(241,227,198,.09); font-size: 11px; color: rgba(241,227,198,.58); cursor: pointer; }
 
 /* hint */
 .hm-hint { position: absolute; left: 50%; bottom: 30px; transform: translate(-50%, 8px); display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 9px; border-radius: 999px; background: rgba(20,14,30,.6); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(241,227,198,.14); font-size: 12.5px; color: rgba(246,236,210,.9); opacity: 0; transition: opacity .25s, transform .3s cubic-bezier(.2,1.3,.4,1); }
@@ -137,6 +148,10 @@ const mmss = (ms: number): string => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
 
+interface Box { l: number; t: number; r: number; b: number }
+const overlap = (a: Box, b: Box): number =>
+  Math.max(0, Math.min(a.r, b.r) - Math.max(a.l, b.l)) * Math.max(0, Math.min(a.b, b.b) - Math.max(a.t, b.t));
+
 export class HUD implements PossessionHud {
   /** Updated by GameScene each frame (screen placement of the possession panel). */
   view: HudView = { cx: 0, cy: 0, zoom: 1, w: 1, h: 1, dpr: 1 };
@@ -162,6 +177,11 @@ export class HUD implements PossessionHud {
   private rowCache: { locked: boolean; busy: boolean; cd: number }[] = [];
   private panelObj: IHauntable | null = null;
   private panelH = 150;
+  private panelX = 0;
+  private panelY = 0;
+  private panelKey = '';
+  private panelSide = '';
+  private panelT = 0;
   private hint: HTMLDivElement;
   private intro: HTMLDivElement | null = null;
   private pauseEl: HTMLDivElement;
@@ -216,7 +236,7 @@ export class HUD implements PossessionHud {
     this.panelName = h('div', 'name');
     card.appendChild(this.panelName);
     for (let i = 0; i < 3; i++) {
-      const r = h('div', 'hm-row', `<span class="key">${i + 1}</span><span class="nm"></span><span class="lock">deepen the haunting</span><i class="cd"></i>`);
+      const r = h('div', 'hm-row', `<span class="key">${i + 1}</span><span class="nm"></span><span class="tier"></span><i class="cd"></i>`);
       r.addEventListener('click', () => this.cb.onAct(i));
       card.appendChild(r);
       this.rows.push(r);
@@ -263,7 +283,7 @@ export class HUD implements PossessionHud {
       this.intro = h('div', 'hm-overlay');
       this.intro.innerHTML = `<div class="hm-sheet"><div class="hm-title">Hollowmere</div>
         <p class="hm-sub">Seven residents think they live alone — and tonight guests are arriving for a party.<br>Slip into the furniture. Haunt every last one of them out.</p>${this.keysHtml()}
-        <div class="hm-go">press any key</div></div>`;
+        ${bestHtml()}<button class="hm-btn primary" data-a="start">Start haunting</button><div class="hm-go">or press any key to start</div></div>`;
       this.root.appendChild(this.intro);
       requestAnimationFrame(() => this.intro?.classList.add('on'));
     }
@@ -295,6 +315,8 @@ export class HUD implements PossessionHud {
   }
 
   // ------------------------------------------------------------- public ----
+
+  get awaitingStart(): boolean { return this.intro !== null; }
 
   dismissIntro(): void {
     const el = this.intro;
@@ -360,9 +382,27 @@ export class HUD implements PossessionHud {
     else this.caption('The house settles.', 'quiet');
   }
 
+  /** Live run clock (under the emblem — the full 15-face cameo row reaches past centre at 1280px) — Raul 2026-10-02: track how long it takes to clear the house. */
+  private clockEl: HTMLDivElement | null = null;
+  setClock(ms: number | null): void {
+    if (ms === null || this.winShown) return;
+    if (!this.clockEl) {
+      this.clockEl = h('div', 'hm-clock');
+      this.clockEl.style.cssText = 'position:absolute;top:70px;left:18px;min-width:46px;text-align:center;font:500 20px/1 ' + FONT_TITLE + ';letter-spacing:.08em;color:#f6ecd2;text-shadow:0 2px 12px rgba(0,0,0,.8);pointer-events:none;';
+      this.root.appendChild(this.clockEl);
+    }
+    const t = mmss(ms);
+    if (this.clockEl.textContent !== t) this.clockEl.textContent = t;
+  }
+
   private onWin(timeMs: number): void {
     if (this.winShown) return;
+    this.setClock(timeMs);
     this.winShown = true;
+    const prevBest = readBest();
+    const isRecord = !prevBest || timeMs < prevBest;
+    if (isRecord) { try { localStorage.setItem(BEST_KEY, String(Math.round(timeMs))); } catch { /* ignore */ } }
+    this.caption(isRecord ? `New record — ${mmss(timeMs)}!` : `Record stands at ${mmss(prevBest)}.`, 'small');
     const s = this.ctx.stats;
     let fav = '—';
     let best = 0;
@@ -440,24 +480,23 @@ export class HUD implements PossessionHud {
     if (o !== this.panelObj) {
       this.panelObj = o;
       if (o) this.openPanel(o);
-      else this.panel.classList.remove('on');
+      else this.panel.classList.remove('on', 'dim');
     }
     if (!o) return;
-    const b = o.bounds;
-    const pw = 240;
-    const ph = this.panelH;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    let x = this.sx(b.right) + 18;
-    let flip = false;
-    if (x + pw > vw - 12) {
-      x = this.sx(b.left) - 18 - pw;
-      flip = true;
+    const now = performance.now();
+    const dt = Math.min(0.05, Math.max(0, (now - this.panelT) / 1000));
+    this.panelT = now;
+    const pick = this.placePanel(o);
+    // glide to the new spot (critically damped, ~80 ms) instead of jumping
+    const k = 1 - Math.exp(-dt * 13);
+    this.panelX += (pick.x - this.panelX) * k;
+    this.panelY += (pick.y - this.panelY) * k;
+    this.panel.style.transform = `translate3d(${this.panelX.toFixed(1)}px,${this.panelY.toFixed(1)}px,0)`;
+    if (pick.side !== this.panelSide) {
+      this.panelSide = pick.side;
+      this.panel.dataset.side = pick.side;
     }
-    x = Math.max(12, Math.min(vw - pw - 12, x));
-    const y = Math.max(64, Math.min(vh - ph - 12, this.sy(b.centerY) - ph / 2));
-    this.panel.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
-    this.panel.classList.toggle('flip', flip);
+    this.panel.classList.toggle('dim', pick.covers);
 
     for (let i = 0; i < 3; i++) {
       const r = this.rows[i];
@@ -486,15 +525,100 @@ export class HUD implements PossessionHud {
     for (let i = 0; i < 3; i++) {
       const r = this.rows[i];
       (r.querySelector('.nm') as HTMLElement).textContent = o.def.actions[i].name;
+      (r.querySelector('.tier') as HTMLElement).innerHTML = '<i></i>'.repeat(o.def.actions[i].tier);
       const locked = !o.unlocked(i);
       r.classList.toggle('locked', locked);
       r.classList.remove('busy');
       this.rowCache[i] = { locked, busy: false, cd: -1 };
     }
+    this.panelH = this.panel.offsetHeight || 150;
+    // snap to the best spot first so the spring-in grows out of the right side
+    this.panelKey = '';
+    const p = this.placePanel(o);
+    this.panelX = p.x;
+    this.panelY = p.y;
+    this.panelT = performance.now();
+    this.panelSide = p.side;
+    this.panel.dataset.side = p.side;
+    this.panel.style.transform = `translate3d(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px,0)`;
     // restart the spring-in animation
-    this.panel.classList.remove('on');
+    this.panel.classList.remove('on', 'dim');
     void this.panel.offsetWidth;
     this.panel.classList.add('on');
-    this.panelH = this.panel.offsetHeight || 150;
+  }
+
+  /**
+   * Where the possession card goes: the candidate spot around the object that
+   * hides the least of what the player is watching — never the object itself,
+   * then the people (and their emote space), then other hauntables. The current
+   * spot carries a switching cost so the card does not flicker between sides.
+   * covers=true when every spot still sits on a person: the card fades back
+   * (hover brings it up) instead of hiding them.
+   */
+  private placePanel(o: IHauntable): { x: number; y: number; side: string; covers: boolean } {
+    const v = this.view;
+    const k = v.zoom / v.dpr;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const pw = PANEL_W;
+    const ph = this.panelH;
+    const g = 12;
+    const top = 60;
+    const m = 10;
+    const b = o.bounds;
+    const L = this.sx(b.left), R = this.sx(b.right), T = this.sy(b.top), B = this.sy(b.bottom);
+    const cx = (L + R) / 2, cy = (T + B) / 2;
+    const self: Box = { l: L - 8, t: T - 8, r: R + 8, b: B + 8 };
+
+    const people: Box[] = [];
+    for (const n of this.ctx.npcs) {
+      if (n.fled || n.hidingIn) continue;
+      const hh = n.def.height * k;
+      const w = Math.max(26, hh * 0.5);
+      const x = this.sx(n.x), y = this.sy(n.y);
+      if (x + w < 0 || x - w > vw || y < 0 || y - hh > vh) continue;
+      people.push({ l: x - w / 2 - 6, t: y - hh - 22, r: x + w / 2 + 6, b: y + 4 });
+    }
+    const things: Box[] = [];
+    for (const h of this.ctx.objects) {
+      if (h === o) continue;
+      const hb = h.bounds;
+      const l = this.sx(hb.left), r = this.sx(hb.right), t = this.sy(hb.top), bt = this.sy(hb.bottom);
+      if (r < 0 || l > vw || bt < 0 || t > vh) continue;
+      things.push({ l, t, r, b: bt });
+    }
+
+    const cands: [string, string, number, number][] = [
+      ['r', 'right', R + g, cy - ph / 2],
+      ['l', 'left', L - g - pw, cy - ph / 2],
+      ['rt', 'right', R + g, T],
+      ['lt', 'left', L - g - pw, T],
+      ['rb', 'right', R + g, B - ph],
+      ['lb', 'left', L - g - pw, B - ph],
+      ['a', 'above', cx - pw / 2, T - g - ph],
+      ['b', 'below', cx - pw / 2, B + g],
+    ];
+    let best = { x: 0, y: 0, side: 'right', covers: false };
+    let bestKey = '';
+    let bs = Infinity;
+    cands.forEach(([key, side, x0, y0], i) => {
+      const x = Math.max(m, Math.min(vw - pw - m, x0));
+      const y = Math.max(top, Math.min(vh - ph - m, y0));
+      const box: Box = { l: x, t: y, r: x + pw, b: y + ph };
+      let onPeople = 0;
+      for (const q of people) onPeople += overlap(box, q);
+      let onThings = 0;
+      for (const q of things) onThings += overlap(box, q);
+      const score = overlap(box, self) * 10 + onPeople * 6 + onThings * 0.6 +
+        (Math.abs(x - x0) + Math.abs(y - y0)) * 30 + i * 40 +
+        (this.panelKey && key !== this.panelKey ? 1800 : 0);
+      if (score < bs) {
+        bs = score;
+        bestKey = key;
+        best = { x, y, side, covers: onPeople > 900 };
+      }
+    });
+    this.panelKey = bestKey;
+    return best;
   }
 }

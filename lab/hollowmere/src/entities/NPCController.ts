@@ -721,8 +721,8 @@ export class NPCController implements INPC {
           else this.runAway();
         }
         break;
-      case 'run': this.moved = this.stepRoute(dt, 1.9); this.rollStumble(dt, 0.025); break;
-      case 'flee': this.moved = this.stepRoute(dt, 2); this.rollStumble(dt, 0.012); break;
+      case 'run': this.moved = this.stepRoute(dt, 2.3); this.rollStumble(dt, 0.025); break;
+      case 'flee': this.moved = this.stepRoute(dt, 2.5); this.rollStumble(dt, 0.012); break;
       case 'stumble':
         if (this.timer >= this.stateDur) {
           this.setState(this.resumeState ?? 'run');

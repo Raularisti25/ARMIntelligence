@@ -2,9 +2,9 @@
 // buildWorld(scene, ctx) -> IWorldView. Textures + placement come from paintStructureTextures().
 import Phaser from 'phaser';
 import type { GameCtx, IWorldView, RoomId } from '../types';
-import { ART, DEPTH, WORLD } from '../config';
-import { ROOMS, ATTIC_POLY, LIGHTS, WALLS, FRONT_DOOR } from '../world/layout';
-import { clamp, lerp, inPoly } from './paint';
+import { ART, DEPTH, HOUSE, WORLD } from '../config';
+import { GARDEN_Y, ROOMS, LIGHTS, WALLS, FRONT_DOOR } from '../world/layout';
+import { clamp, lerp, tile } from './paint';
 import { paintStructureTextures } from './structureArt';
 import type { DoorSprite } from './worldManifest';
 
@@ -35,8 +35,8 @@ interface DoorRt {
   img: Phaser.GameObjects.Image; def: DoorSprite;
   o: number; v: number; target: number; rest: number; hold: number; wallX: number; slam: boolean; wallIdx: number;
 }
-interface StaticRt { img: Phaser.GameObjects.Image; bx: number; by: number; f: number; base: number; room?: RoomId }
-interface Mote { img: Phaser.GameObjects.Image; x: number; y: number; vx: number; vy: number; age: number; life: number; room: RoomId | null; ph: number; base: number }
+interface StaticRt { img: Phaser.GameObjects.Image | Phaser.GameObjects.TileSprite; bx: number; by: number; f: number; base: number; room?: RoomId }
+interface Mote { img: Phaser.GameObjects.Image; x: number; y: number; vx: number; vy: number; age: number; life: number; room: RoomId | 'outside' | null; ph: number; base: number }
 interface Bat { img: Phaser.GameObjects.Image; on: boolean; x: number; y0: number; vx: number; t: number; wait: number }
 interface Cloud { img: Phaser.GameObjects.Image; bx: number; y: number; sp: number; base: number }
 interface Star { img: Phaser.GameObjects.Image; u: number; v: number; sz: number; ph: number; spd: number; base: number }
@@ -88,7 +88,12 @@ export function buildWorld(scene: Phaser.Scene, ctx: GameCtx): IWorldView {
   // ------------------------------------------------------------ statics
   const statics: StaticRt[] = [];
   for (const s of man.statics) {
-    const im = scene.add.image(s.x, s.y, s.key).setOrigin(s.ox ?? 0, s.oy ?? 0).setScale(S).setDepth(s.depth);
+    const im = s.tile
+      ? tile(scene, s.x, s.y, s.w!, s.h!, s.key, s.depth)
+      : scene.add.image(s.x, s.y, s.key).setScale(S).setDepth(s.depth);
+    im.setOrigin(s.ox ?? 0, s.oy ?? 0);
+    // softTex uses its own resolution; the manifest supplies world dimensions.
+    if (!s.tile && s.w !== undefined && s.h !== undefined) im.setDisplaySize(s.w, s.h);
     const base = s.alpha ?? 1;
     im.setAlpha(base);
     if (s.add) im.setBlendMode(ADD);
@@ -139,11 +144,12 @@ export function buildWorld(scene: Phaser.Scene, ctx: GameCtx): IWorldView {
     const glow = scene.add.image(l.x, l.y, l.glowKey).setOrigin(0, 0).setScale(S).setDepth(DEPTH.light).setBlendMode(ADD).setAlpha(0.75);
     let fixture: Phaser.GameObjects.Image | undefined;
     if (l.fixtureKey) fixture = scene.add.image(l.fx ?? l.x, l.fy ?? l.y, l.fixtureKey).setOrigin(0, 0).setScale(S).setDepth(DEPTH.structure - 1);
+    if (l.w !== undefined && l.h !== undefined) glow.setDisplaySize(l.w, l.h);
     const kind = def?.kind;
     glows.push({
       glow, fixture, room: l.room, phase: hash(glows.length * 4.7 + 1) * 100,
       fireLike: kind === 'fire' || kind === 'candle' || kind === 'lantern', fixed: kind === 'window',
-      x: l.x, y: l.y, w: glow.width * S, h: glow.height * S,
+      x: l.x, y: l.y, w: glow.displayWidth, h: glow.displayHeight,
     });
   }
 
@@ -151,6 +157,7 @@ export function buildWorld(scene: Phaser.Scene, ctx: GameCtx): IWorldView {
   const darks = new Map<RoomId, Phaser.GameObjects.Image[]>();
   for (const d of man.dark) {
     const im = scene.add.image(d.x, d.y, d.key).setOrigin(0, 0).setScale(S).setDepth(DEPTH.dark).setAlpha(0).setVisible(false);
+    if (d.w !== undefined && d.h !== undefined) im.setDisplaySize(d.w, d.h);
     const arr = darks.get(d.room) ?? []; arr.push(im); darks.set(d.room, arr);
   }
 
@@ -198,16 +205,17 @@ export function buildWorld(scene: Phaser.Scene, ctx: GameCtx): IWorldView {
 
   // ------------------------------------------------------------------ update
   let T = 0;
+  const outsideMote = (x: number, y: number): boolean =>
+    (x < HOUSE.x0 - 40 || x > HOUSE.x1 + 40) && y < GARDEN_Y - 20;
   const startMote = (m: Mote, view: Phaser.Geom.Rectangle): void => {
     for (let k = 0; k < 6; k++) {
       const x = clamp(view.x + Math.random() * view.width, WORLD.x0, WORLD.x1);
       const y = clamp(view.y + Math.random() * view.height, WORLD.y0, WORLD.y1);
-      for (const r of ROOMS) {
-        if (x > r.x0 && x < r.x1 && y > r.ceil && y < r.floorY && (r.floor !== 'attic' || inPoly(x, y, ATTIC_POLY))) {
-          m.x = x; m.y = y; m.room = r.id; m.age = 0; m.life = rr(5, 11);
-          m.vx = rr(-7, 7); m.vy = rr(-5, 3);
-          return;
-        }
+      // Outside the house only (Raul 2026-10-02): no twinkles inside rooms.
+      if (outsideMote(x, y)) {
+        m.x = x; m.y = y; m.room = 'outside'; m.age = 0; m.life = rr(5, 11);
+        m.vx = rr(-7, 7); m.vy = rr(-5, 3);
+        return;
       }
     }
     m.room = null;
@@ -396,6 +404,8 @@ export function buildWorld(scene: Phaser.Scene, ctx: GameCtx): IWorldView {
         }
         m.x += (m.vx + Math.sin(T * 0.8 + m.ph) * 5) * dt;
         m.y += (m.vy + Math.cos(T * 0.6 + m.ph) * 4) * dt;
+        // Drifting motes can cross the boundary even when spawned outside.
+        if (!outsideMote(m.x, m.y)) { m.img.setVisible(false); m.room = null; continue; }
         const t = m.age / m.life;
         const fade = Math.min(t * 5, 1) * Math.min((1 - t) * 5, 1);
         m.img.setPosition(m.x, m.y).setScale(S * ms).setAlpha(m.base * fade * clamp(roomLevel(m.room ?? 'outside'), 0, 1));

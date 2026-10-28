@@ -1,0 +1,26 @@
+{
+  "slug": "hollowmere-playtest-terrain-start-clock",
+  "behavior": "Hollowmere renders tiled basement earth, waits for Start, keeps motes outdoors, and records a 15-person victory through real haunt actions",
+  "tags": [
+    "hollowmere",
+    "playtest"
+  ],
+  "paths": [
+    "hollowmere/src",
+    "hollowmere/tests/playtest.py"
+  ],
+  "adapter": "command",
+  "spec": {
+    "cmd": "python3",
+    "args": [
+      "tests/playtest.py"
+    ],
+    "cwd": "hollowmere",
+    "files": [
+      "hollowmere/tests/playtest.py"
+    ],
+    "timeoutMs": 200000,
+    "stdoutMatch": "HOLLOWMERE_PLAYTEST_PASS"
+  },
+  "why": "Raul saw sky beneath the basement and jumpy controls; the renderer ignored tile and world dimensions. Play must start at the intro and the recorded clock must freeze after all 15 people actually flee."
+}

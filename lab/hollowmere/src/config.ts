@@ -43,17 +43,17 @@ export const DEPTH = {
 };
 
 export const GHOST = {
-  maxSpeed: 500,
-  response: 9.5, // accel time-constant (1/s) while steering
+  maxSpeed: 540,
+  response: 6.2, // accel time-constant (1/s) while steering (9.5 felt jumpy, 4.8 felt sluggish)
   glide: 4.2, // decel time-constant (1/s) when released
-  reach: 70, // extra distance around an object's bounds that counts as "near"
+  reach: 84, // extra distance around an object's bounds that counts as "near"
 };
 
 export const CAMERA = {
   visibleH: 1000, // world units visible vertically at default zoom
   minVisibleH: 640,
   maxVisibleH: 2050,
-  follow: 4.2,
+  follow: 5.2,
 };
 
 export const INTENSITY = {
@@ -63,7 +63,7 @@ export const INTENSITY = {
 
 // Fear tuning — ONE place to make people easier/harder to scare.
 export const FEAR = {
-  gain: 0.8, // fear added per point of scare impact (was 0.55)
+  gain: 0.9, // fear added per point of scare impact (was 0.55, then 0.8)
   worried: 30, // visible unease: glance behind, quicker steps, hugging arms
   restless: 45, // pace between rooms / group up instead of settling
   contagionRange: 340, // px, same room

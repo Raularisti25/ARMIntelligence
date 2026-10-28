@@ -10,7 +10,7 @@ const act = (
   name: string, tier: 1 | 2 | 3, scare: number, noise: number, duration: number, fx: Fx[],
   tags: Tags, emits?: ActionDef['emits'],
 ): ActionDef => ({
-  name, tier, scare, noise, cooldown: tier === 1 ? 3 : tier === 2 ? 6 : 10, duration, fx, tags, ...(emits ? { emits } : {}),
+  name, tier, scare, noise, cooldown: tier === 1 ? 2 : tier === 2 ? 4 : 6.5, duration, fx, tags, ...(emits ? { emits } : {}),
 });
 const sfx = (at: number, id: SfxId, vol?: number, rate?: number): Fx => ({ k: 'sfx', at, id, vol, rate });
 /** Repeat an sfx n times every `gap` ms. */

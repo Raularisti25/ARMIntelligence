@@ -372,6 +372,7 @@ export interface IIntensity {
   readonly level: number; // 0..3
   readonly levelName: string;
   readonly scareMult: number;
+  readonly cooldownMult: number; // <1 as the house wakes: haunts recharge faster
   addFear(impact: number): void;
   addFled(): void;
   set(v: number): void; // debug

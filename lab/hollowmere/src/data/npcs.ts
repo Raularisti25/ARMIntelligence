@@ -113,14 +113,14 @@ const guest = (
 };
 
 export const GUEST_ARRIVALS = [
-  guest('cordelia', 'Lady Cordelia Voss', 'the socialite', 'marigold', 14, { skin: 0xf3d2b8, hair: 0x2c2230, top: 0x2f7a63, bottom: 0x1f5444, accent: 0xe8d9a8 }, { courage: 0.35, curiosity: 0.55, skepticism: 0.2, pitch: 230 }),
-  guest('bram', 'Bram Quill', 'the poet', 'augustus', 20, { skin: 0xd9a77f, hair: 0x2a2a35, top: 0x3a4f86, bottom: 0x2b2f48, accent: 0xe9e0c8 }, { courage: 0.3, curiosity: 0.7, skepticism: 0.2, pitch: 118 }),
-  guest('percy', 'Percy Dunmore', 'the nephew', 'toby', 52, { skin: 0xe9bf9b, hair: 0x5a3320, top: 0xb5483d, bottom: 0x303a5c, accent: 0xf1d9a0 }, { courage: 0.62, curiosity: 0.9, skepticism: 0.15 }),
-  guest('imogen', 'Imogen Pell', 'the art dealer', 'marigold', 58, { skin: 0xc99573, hair: 0x1d1a1f, top: 0xb04d6e, bottom: 0x7a2f4c, accent: 0xf0d9c4 }, { courage: 0.5, curiosity: 0.4, skepticism: 0.5, pitch: 205 }),
-  guest('felix', 'Felix Ashby', 'the gambler', 'augustus', 96, { skin: 0xe8c3a2, hair: 0x9a6a2e, top: 0xc99a2e, bottom: 0x3b3a2f, accent: 0x5a2d2d }, { courage: 0.72, curiosity: 0.3, skepticism: 0.75, pitch: 104 }),
-  guest('wendeline', 'Aunt Wendeline', 'the gossip', 'hester', 102, { skin: 0xe6c7b0, hair: 0xd8d2cc, top: 0x3f8f8b, bottom: 0x2d6360, accent: 0xe0b0c0 }, { courage: 0.3, curiosity: 0.7, skepticism: 0.25, hearing: 1, speed: 74, pitch: 205 }),
-  guest('lucan', 'Dr. Lucan Hale', 'the physician', 'augustus', 142, { skin: 0xb98660, hair: 0x4a4a52, top: 0x5b6670, bottom: 0x2f3338, accent: 0xe4ddd0 }, { courage: 0.8, curiosity: 0.5, skepticism: 0.9, pitch: 112 }),
-  guest('octavia', 'Octavia Marsh', 'the widow', 'marigold', 148, { skin: 0xeccdb4, hair: 0x6b6b78, top: 0x4b3a63, bottom: 0x2f2542, accent: 0xcbb8e0 }, { courage: 0.22, curiosity: 0.45, skepticism: 0.1, pitch: 190 }),
+  guest('cordelia', 'Lady Cordelia Voss', 'the socialite', 'marigold', 9, { skin: 0xf3d2b8, hair: 0x2c2230, top: 0x2f7a63, bottom: 0x1f5444, accent: 0xe8d9a8 }, { courage: 0.35, curiosity: 0.55, skepticism: 0.2, pitch: 230 }),
+  guest('bram', 'Bram Quill', 'the poet', 'augustus', 13, { skin: 0xd9a77f, hair: 0x2a2a35, top: 0x3a4f86, bottom: 0x2b2f48, accent: 0xe9e0c8 }, { courage: 0.3, curiosity: 0.7, skepticism: 0.2, pitch: 118 }),
+  guest('percy', 'Percy Dunmore', 'the nephew', 'toby', 34, { skin: 0xe9bf9b, hair: 0x5a3320, top: 0xb5483d, bottom: 0x303a5c, accent: 0xf1d9a0 }, { courage: 0.62, curiosity: 0.9, skepticism: 0.15 }),
+  guest('imogen', 'Imogen Pell', 'the art dealer', 'marigold', 38, { skin: 0xc99573, hair: 0x1d1a1f, top: 0xb04d6e, bottom: 0x7a2f4c, accent: 0xf0d9c4 }, { courage: 0.5, curiosity: 0.4, skepticism: 0.5, pitch: 205 }),
+  guest('felix', 'Felix Ashby', 'the gambler', 'augustus', 62, { skin: 0xe8c3a2, hair: 0x9a6a2e, top: 0xc99a2e, bottom: 0x3b3a2f, accent: 0x5a2d2d }, { courage: 0.72, curiosity: 0.3, skepticism: 0.75, pitch: 104 }),
+  guest('wendeline', 'Aunt Wendeline', 'the gossip', 'hester', 66, { skin: 0xe6c7b0, hair: 0xd8d2cc, top: 0x3f8f8b, bottom: 0x2d6360, accent: 0xe0b0c0 }, { courage: 0.3, curiosity: 0.7, skepticism: 0.25, hearing: 1, speed: 74, pitch: 205 }),
+  guest('lucan', 'Dr. Lucan Hale', 'the physician', 'augustus', 92, { skin: 0xb98660, hair: 0x4a4a52, top: 0x5b6670, bottom: 0x2f3338, accent: 0xe4ddd0 }, { courage: 0.8, curiosity: 0.5, skepticism: 0.9, pitch: 112 }),
+  guest('octavia', 'Octavia Marsh', 'the widow', 'marigold', 96, { skin: 0xeccdb4, hair: 0x6b6b78, top: 0x4b3a63, bottom: 0x2f2542, accent: 0xcbb8e0 }, { courage: 0.22, curiosity: 0.45, skepticism: 0.1, pitch: 190 }),
 ];
 export const GUESTS: NpcDef[] = GUEST_ARRIVALS.map((g) => g.def);
 export const TOTAL_PEOPLE = NPCS.length + GUESTS.length;
