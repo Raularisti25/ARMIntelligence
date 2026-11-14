@@ -1,36 +1,36 @@
 # ARMIntelligence
 
-Portable, public versions of homemade AI skills originally developed inside a larger private agent system.
+Portable AI-agent skills and selected experiments. Public releases are designed to be reviewed, adapted, and used without access to private ARM infrastructure.
 
-## Included skills
+## Skills
 
-- [`/armskill`](skills/armskill/SKILL.md) - research, design, create, upgrade, merge, split, and verify homemade AI skills. Includes the `/steal` competitive-research methodology directly inside the skill, so no separate `/steal` install is required.
-- [`/armsafe`](skills/armsafe/SKILL.md) - defensive, read-only-by-default security posture and application audit skill for systems the user owns or is authorized to assess.
-- [`/arms`](skills/arms/SKILL.md) - multi-agent orchestration doctrine: keep judgment/integration in the strongest session and delegate separable execution to lower-cost workers when worthwhile.
-- [`/armpartner`](skills/armpartner/SKILL.md) - partner-agent runtime for bounded collaboration on an owner-led project. The AI does most research, implementation, testing, debugging, and documentation while the human collaborator provides judgment, engineering direction, and quality review within the assigned scope.
+| Skill | Purpose |
+| --- | --- |
+| [`/armskill`](skills/armskill/SKILL.md) | Design, research, improve, and validate AI skills. Includes a lawful competitive-research method. |
+| [`/armsafe`](skills/armsafe/SKILL.md) | Audit and harden authorized systems. Defensive and read-only by default. |
+| [`/arms`](skills/arms/SKILL.md) | Coordinate bounded agent work with explicit permissions and verification. |
+| [`/armpartner`](skills/armpartner/SKILL.md) | Support scoped human-agent engineering collaboration through a Partner Package. |
 
-## LAB
+Each skill has a standalone `SKILL.md`. Review the instructions before granting tools, credentials, or repository access.
 
-- [`lab/pi-wake`](lab/pi-wake/README.md) - experimental portable extraction of the Raspberry Pi wake lifecycle: systemd persistence, one-at-a-time wake execution, productive-work settle, idle/deferred backoff, locking, health state, and graceful shutdown.
-- [`lab/prediction-market`](lab/prediction-market/README.md) - read-only, paper-only prediction-market research package with a public Polymarket scanner and two scoped collaborator tasks: probability calibration/replay and uncertainty-aware Kelly sizing with correlated-event controls.
+## Experiments
 
-## Portability
+Experimental work lives under `lab/` and is separate from the reusable skills:
 
-These public copies intentionally omit private infrastructure, machine paths, credentials, queues, internal hosts, owner-only orchestration, and confidential project context. They preserve the underlying behavior and should be adapted to the target LLM/runtime's own homemade-skill mechanism.
+- [Pi wake](lab/pi-wake/README.md): a systemd-based agent wake lifecycle.
+- [Prediction markets](lab/prediction-market/README.md): public-data research, read-only and paper-only.
+- [Hollowmere](lab/hollowmere/README.md): a local TypeScript game experiment.
 
-`/armpartner` is intentionally the **partner-agent side**, not the private owner/orchestrator skill. It expects a separate Partner Package that defines the authorized problem, desired result, scope, guardrails, starting points, and proof standard.
+## Use
 
-## Suggested install workflow
+1. Read the target `SKILL.md` and any referenced files.
+2. Adapt tool names, permissions, and paths to your own agent runtime. Grant only the access required.
+3. Verify one intended trigger and one nearby non-trigger before relying on the skill.
 
-Give the repository URL to the target LLM and instruct it to:
+The skills contain instructions, not automatic trust or authorization. Do not run unreviewed commands, share secrets, or access systems outside your permissions. `/armpartner` requires a separately scoped Partner Package.
 
-1. Fetch and read the relevant `SKILL.md` completely.
-2. Inspect its own existing skill system before creating anything.
-3. Classify the skill as CREATE, MERGE, UPGRADE, or SKIP.
-4. Adapt paths, agent tools, model tiers, security tooling, repository access, and installation mechanics to its own runtime.
-5. Preserve behavior and routing boundaries, not foreign infrastructure.
-6. Test at least one positive trigger and one neighboring negative trigger for installed skills.
+## Security
 
-For a LAB/ARM collaboration package, the collaborator's agent should install/read [`/armpartner`](skills/armpartner/SKILL.md) first, then consume the Partner Package supplied by the project owner.
+For suspected vulnerabilities, avoid posting credentials or exploit details in public issues. Contact the repository maintainer privately with a minimal reproduction and affected paths. Public examples intentionally exclude internal infrastructure and credentials.
 
-Repository: `https://github.com/Raularisti25/ARMIntelligence`
+[Repository](https://github.com/Raularisti25/ARMIntelligence)
