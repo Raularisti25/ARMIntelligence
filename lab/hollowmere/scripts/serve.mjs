@@ -19,17 +19,30 @@ const TYPES = {
 let lastPing = Date.now();
 
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+  let url;
+  let rel;
+  try {
+    url = new URL(req.url ?? '/', 'http://127.0.0.1');
+    rel = decodeURIComponent(url.pathname);
+  } catch {
+    res.writeHead(400, { 'content-type': 'text/plain' });
+    res.end('bad request');
+    return;
+  }
   if (url.pathname === '/__alive') {
     lastPing = Date.now();
     res.writeHead(200, { 'content-type': 'text/plain', 'cache-control': 'no-store' });
     res.end('ok');
     return;
   }
-  let rel = decodeURIComponent(url.pathname);
+  if (rel.includes('\0')) { res.writeHead(400).end(); return; }
   if (rel.endsWith('/')) rel += 'index.html';
-  const file = path.join(root, path.normalize(rel));
-  if (!file.startsWith(root)) { res.writeHead(403).end(); return; }
+  const file = path.resolve(root, `.${rel}`);
+  const relative = path.relative(root, file);
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    res.writeHead(403).end();
+    return;
+  }
   fs.readFile(file, (err, data) => {
     if (err) {
       res.writeHead(404, { 'content-type': 'text/plain' });
