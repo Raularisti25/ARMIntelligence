@@ -10,6 +10,7 @@ Portable AI-agent skills and selected experiments. Public releases are designed 
 | [`/armsafe`](skills/armsafe/SKILL.md) | Audit and harden authorized systems. Defensive and read-only by default. |
 | [`/arms`](skills/arms/SKILL.md) | Coordinate bounded agent work with explicit permissions and verification. |
 | [`/armpartner`](skills/armpartner/SKILL.md) | Support scoped human-agent engineering collaboration through a Partner Package. |
+| [`/school`](skills/school/README.md) | Run any course with document onboarding, assignment coaching, artifact audits, exam preparation, and deadline tracking. |
 
 Each skill has a standalone `SKILL.md`. Review the instructions before granting tools, credentials, or repository access.
 
